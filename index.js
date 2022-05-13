@@ -1,11 +1,13 @@
 const express = require("express")
+var cors = require('cors')
 const res = require("express/lib/response")
 const { Todo } = require("./database")
 
 const app = express()
-const PORT = 8000
+const PORT = process.env.PORT || 8000
 
 app.use(express.json())
+app.use(cors())
 
 app.post("/todo", async (req, res) => {
     try {
