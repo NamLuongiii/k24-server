@@ -45,9 +45,9 @@ router.post("/login", async (req, res) => {
 
         // If validated: set token to cockie
         const token = await sign({ _id: user._id })
-        res.cookie("token", token)
+        // res.cookie("token", token)
 
-        res.status(200).json({ message: "Login success" })
+        res.status(200).json({ message: "Login success", token })
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: error.message })
