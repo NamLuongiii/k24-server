@@ -15,8 +15,26 @@ const todoSchema = new mongoose.Schema({
     complete: Boolean,
 });
 
+const userSchema = new mongoose.Schema({
+    phone: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    name: String,
+    password: {
+        type: String,
+        required: true,
+    },
+    address: String,
+    avatar: String,
+}, { timestamps: true });
+
 const Todo = mongoose.model('Todo', todoSchema);
+const User = mongoose.model('User', userSchema);
+
 
 module.exports = {
-    Todo: Todo
+    Todo,
+    User,
 }

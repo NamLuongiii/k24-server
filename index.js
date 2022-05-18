@@ -2,12 +2,18 @@ const express = require("express")
 var cors = require('cors')
 const res = require("express/lib/response")
 const { Todo } = require("./database")
+const user = require("./user")
+const cookieParser = require('cookie-parser');
 
 const app = express()
 const PORT = process.env.PORT || 8000
 
 app.use(express.json())
 app.use(cors())
+app.use(cookieParser());
+
+app.use('/user', user);
+
 
 app.post("/todo", async (req, res) => {
     try {
@@ -59,6 +65,8 @@ app.delete("/todo/:id", async (req, res) => {
         res.status(400).json({ message: error.message })
     }
 })
+
+
 
 app.listen(PORT, () => {
     console.log("Server is listening on :", PORT)
