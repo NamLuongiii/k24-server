@@ -1,20 +1,15 @@
 const express = require("express")
-const { hash, verify } = require("./util/bscript")
-const { User } = require("./database")
-const { sign, decoded } = require("./util/jwt")
+const { hash, verify } = require("../util/bscript")
+const { User, Cart } = require("../database/database")
+const { sign } = require("../util/jwt")
+const { validateToken } = require("../middleware")
 const router = express.Router()
 
-router.get("/", async (req, res) => {
+router.get("/", validateToken, async (req, res) => {
     try {
-
-        // verify cookies
-        const token = req.cookies.token;
-        const payload = await decoded(token);
-
-        const user = await User.findOne({_id: payload._id})
-
+        const { _id } = req.tokenPayload
+        const user = await User.findOne({ _id })
         if (!user) throw Error("Not exsit id")
-
         res.status(200).json(user)
     } catch (error) {
         res.status(400).json({ message: error.message })
@@ -26,10 +21,22 @@ router.post("/", async (req, res) => {
         const user = await User.create({
             ...req.body,
             password: await hash(req.body.password),
-        })
+        });
+        await Cart.create({user: user._id});
         res.status(200).json({ user: user })
     } catch (error) {
         res.status(400).json({ message: error.message })
+    }
+})
+
+router.put("/", validateToken, async (req, res) => {
+    try {
+        const { _id } = req.tokenPayload;
+        const user = await User.updateOne({ _id }, req.body);
+        res.status(200).json({ user })
+    } catch (error) {
+        res.status(500);
+        next(error);
     }
 })
 
@@ -38,7 +45,7 @@ router.post("/login", async (req, res) => {
         // validate user + password
         const { phone, password } = req.body
         const user = await User.findOne({ phone })
-        console.log(user);
+        console.log(user)
         if (!user) throw Error("Not exsit phone")
         if (!(await verify(password, user.password)))
             throw Error("Wrong password")
@@ -49,13 +56,9 @@ router.post("/login", async (req, res) => {
 
         res.status(200).json({ message: "Login success", token })
     } catch (error) {
-        console.log(error);
+        console.log(error)
         res.status(400).json({ message: error.message })
     }
-})
-
-router.post("/logout", (req, res) => {
-    res.status(200).json({ name: "nam" })
 })
 
 module.exports = router

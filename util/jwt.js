@@ -1,5 +1,4 @@
 var jwt = require('jsonwebtoken');
-var token = jwt.sign({ foo: 'bar' }, 'shhhhh');
 const SECRET_KEY = '123';
 
 async function sign(payload) {
